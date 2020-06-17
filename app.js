@@ -26,7 +26,7 @@ const additionalInformation = async (roomID, userInfo) => {
     console.log('send add info done');
     return data;
   } catch (error) {
-    console.log(JSON.stringify(error));
+    throw error;
   }
 };
 
@@ -47,7 +47,7 @@ const addTag = async (roomID) => {
     const { data } = await axios.post(url, payload, { headers: headers });
     return data;
   } catch (error) {
-    console.log(JSON.stringify(error));
+    throw error;
   }
 };
 
@@ -68,7 +68,7 @@ const sendMessage = async (roomID, message) => {
     const { data } = await axios.post(url, payload, { headers: headers });
     return data;
   } catch (error) {
-    console.log(JSON.stringify(error));
+    throw error;
   }
 };
 
