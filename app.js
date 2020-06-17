@@ -23,7 +23,20 @@ const additionalInformation = async (roomID, userInfo) => {
     };
 
     const { data } = await axios.post(url, paylaod, { headers: headers });
-    console.log('send add info done');
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getTag = async (roomID) => {
+  try {
+    const url = `${process.env.QISMO_BASE_URL}/api/v1/room_tag/${roomID}`;
+    const headers = {
+      Authorization: process.env.QISMO_AUTH_TOKEN,
+    };
+
+    const { data } = await axios.get(url, { headers: headers });
     return data;
   } catch (error) {
     throw error;
@@ -46,6 +59,18 @@ const addTag = async (roomID) => {
 
     const { data } = await axios.post(url, payload, { headers: headers });
     return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const addTagWithRoomID = async (roomID) => {
+  try {
+    const tags = await getTag(roomID);
+    const tagRoomID = tags.filter((value) => value.name == roomID);
+    if (tagRoomID) return;
+
+    return addTag(roomID);
   } catch (error) {
     throw error;
   }
@@ -160,7 +185,7 @@ app.post('/ticket', async (req, res, next) => {
 
     Promise.all([
       additionalInformation(roomID, addInfo),
-      addTag(roomID),
+      addTagWithRoomID(roomID),
       sendMessage(roomID, message),
     ]);
 
