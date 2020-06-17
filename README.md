@@ -1,29 +1,32 @@
-# README #
+# QISMO Demokit 2
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Objective: The main goal is to ease business taking sales order from WhatsApp with proper level of sophistication. More [Qiscus Multichannel for Sales](https://quip.com/NkaBAXcKMrXn/Qiscus-Multichannel-for-Sales)
 
-### What is this repository for? ###
+### Features Highlight
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+- **Sales Order template:** For capturing essential order data for later to be used for e-invoice and order reporting generation.
+- **Auto Order ID generation:** Provide unique ID number for easy order referencing and tracking.
+- **Auto E-Invoice generation:** Provide auto pre-defined flexible e-invoice template message.
+- **Auto room tag by Order ID:** To speed up room filtering process for later monitoring and audit purposes.
 
-### How do I get set up? ###
+### Requirements
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+- Node = 13.7.0
+- Npm = 6.13.6
 
-### Contribution guidelines ###
+### Setting up Project
 
-* Writing tests
-* Code review
-* Other guidelines
+- Setup environtment variable, rename `.env.example` to `.env`
+- Install all project dependencies.
 
-### Who do I talk to? ###
+```bash
+npm install
+```
 
-* Repo owner or admin
-* Other community or team contact
+### How to Run
+
+- Compiles and hot-reloads with nodemon
+
+```bash
+npm run dev
+```
