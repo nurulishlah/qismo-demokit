@@ -71,7 +71,8 @@ const addTagWithRoomID = async (roomID) => {
     const tagRoomID = tags.filter((value) => value.name == roomID);
     if (tagRoomID) return;
 
-    return addTag(roomID);
+    const result = await addTag(roomID);
+    return result;
   } catch (error) {
     throw error;
   }
