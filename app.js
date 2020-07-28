@@ -70,12 +70,12 @@ const addTag = async (tagName, roomID) => {
   }
 };
 
-const sendMessage = async (roomID, message) => {
+const sendMessage = async (roomID, message, senderEmail=process.env.QISMO_ADMIN_EMAIL) => {
   try {
     console.log(`send message ${message} to room: ${roomID}`);
     const url = `${process.env.QISMO_BASE_URL}/${process.env.QISMO_APP_ID}/bot`;
     const payload = {
-      sender_email: process.env.QISMO_ADMIN_EMAIL,
+      sender_email: senderEmail,
       message: message,
       type: 'text',
       room_id: roomID.toString(),
@@ -117,13 +117,16 @@ const generateCallURLs = async (body) => {
     const agentName = body.agent.name;
     const agentEmail = body.agent.email;
     let addInfo = body.additional_info;
-    addInfo[0] = { key: 'Order ID', value: roomID };
 
+    // Generate Call URL
     const custURL = await generateUrl(roomID, custName, custAvatar);
+    const agentURL = await generateUrl(roomID, agentName);
 
-    console.log(custURL);
+    addInfo.push({key: "Call URL", value: `https://${agentURL.shortenUrl}`});
+    console.log(addInfo, custURL.shortenUrl, agentURL.shortenUrl);
 
-    return custURL;
+    sendMessage(roomID, `Berikut link untuk Callnya:\nhttps://${custURL.shortenUrl}`);
+    additionalInformation(roomID, addInfo);
 
   } catch (error) {
     throw error;
