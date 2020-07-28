@@ -85,11 +85,50 @@ const sendMessage = async (roomID, message) => {
     };
 
     const { data } = await axios.post(url, payload, { headers: headers });
+
     return data;
   } catch (error) {
     throw error;
   }
 };
+
+const generateUrl = async (roomID, name, avatar="https://image.flaticon.com/icons/svg/145/145867.svg") => {
+  try {
+    const url = process.env.GENERATE_MEET_URL;
+    const payload = {
+      baseUrl: `https://meet.qiscus.com/${roomID}`,
+	    avatar: avatar,
+	    name: name
+    };
+
+    const { data } = await axios.post(url, payload);
+ 
+    return data
+  } catch (error) {
+    throw error;
+  }
+};
+
+const generateCallURLs = async (body) => {
+  try {
+    const roomID = body.room_id;
+    const custName = body.customer.name;
+    const custAvatar = body.customer.avatar;
+    const agentName = body.agent.name;
+    const agentEmail = body.agent.email;
+    let addInfo = body.additional_info;
+    addInfo[0] = { key: 'Order ID', value: roomID };
+
+    const custURL = await generateUrl(roomID, custName, custAvatar);
+
+    console.log(custURL);
+
+    return custURL;
+
+  } catch (error) {
+    throw error;
+  }
+}
 
 app.get('/', (req, res, next) => {
   res.status(200).json({
@@ -159,6 +198,7 @@ app.post('/ticket', async (req, res, next) => {
   try {
     const body = req.body;
     const roomID = body.room_id;
+    const custName = body.customer.name;
     let addInfo = body.additional_info;
     addInfo[0] = { key: 'Order ID', value: roomID };
 
@@ -180,12 +220,29 @@ app.post('/ticket', async (req, res, next) => {
     Promise.all([
       additionalInformation(roomID, addInfo),
       addTag(roomID, roomID),
-      sendMessage(roomID, message),
+      sendMessage(roomID, message)
     ]);
 
     res.status(200).json({
       success: true,
       message: 'Successfully send e-invoice',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/send-links', async (req, res, next) => {
+  try {
+    const body = req.body;
+
+    Promise.all([
+      generateCallURLs(body)
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Successfully send call links',
     });
   } catch (error) {
     next(error);
