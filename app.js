@@ -274,7 +274,7 @@ app.post('/ticket', async (req, res, next) => {
   }
 });
 
-app.post('/send-links', async (req, res, next) => {
+app.post('/send-link', async (req, res, next) => {
   try {
     const body = req.body;
 
