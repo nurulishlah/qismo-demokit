@@ -70,21 +70,38 @@ const addTag = async (tagName, roomID) => {
   }
 };
 
-const sendMessage = async (roomID, message, senderEmail=process.env.QISMO_ADMIN_EMAIL) => {
+const sendMessage = async (roomID, message, msgType="text", callUrl="",
+  senderEmail=process.env.QISMO_ADMIN_EMAIL) => {
   try {
     console.log(`send message ${message} to room: ${roomID}`);
     const url = `${process.env.QISMO_BASE_URL}/${process.env.QISMO_APP_ID}/bot`;
-    const payload = {
+    let msgPayload = {
       sender_email: senderEmail,
       message: message,
-      type: 'text',
+      type: msgType,
       room_id: roomID.toString(),
     };
+    if (msgType === "buttons") {
+      msgPayload["payload"] = {
+        text: message,
+        buttons: [
+          {
+              label: "Lakukan panggilan",
+              type: "link",
+              payload: {
+                url: callUrl
+              }
+          }
+        ]
+      }  
+    }
+
     const headers = {
       Authorization: process.env.QISMO_AUTH_TOKEN,
+      QISCUS_SDK_SECRET: process.env.QISCUS_SDK_SECRET
     };
 
-    const { data } = await axios.post(url, payload, { headers: headers });
+    const { data } = await axios.post(url, msgPayload, { headers: headers });
 
     return data;
   } catch (error) {
@@ -116,6 +133,7 @@ const generateCallURLs = async (body) => {
     const custAvatar = body.customer.avatar;
     const agentName = body.agent.name;
     const agentEmail = body.agent.email;
+    const channelType = body.channel_type;
     let addInfo = body.additional_info;
 
     // Generate Call URL
@@ -141,8 +159,12 @@ const generateCallURLs = async (body) => {
     }
     
     // Send the link to customer as a message
-    sendMessage(roomID, `Berikut link untuk Callnya:\n${custCallURL}`);
-    // 
+    if (channelType === "WhatsApp") {
+      sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`); 
+    } else {
+      sendMessage(roomID, "Berikut link untuk call-nya", "buttons", custCallURL); 
+    }
+    
     additionalInformation(roomID, addInfo);
 
   } catch (error) {
