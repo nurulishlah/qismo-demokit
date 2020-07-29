@@ -121,11 +121,28 @@ const generateCallURLs = async (body) => {
     // Generate Call URL
     const custURL = await generateUrl(roomID, custName, custAvatar);
     const agentURL = await generateUrl(roomID, agentName);
+    
+    // Parse customer and agent call URLs
+    const agentCallURL = `https://${agentURL.shortenUrl}#config.prejoinPageEnabled=false&config.requireSetPassword=false`;
+    const custCallURL = `https://${custURL.shortenUrl}#config.prejoinPageEnabled=false&config.requireSetPassword=false`;
 
-    addInfo.push({key: "Call URL", value: `https://${agentURL.shortenUrl}`});
-    console.log(addInfo, custURL.shortenUrl, agentURL.shortenUrl);
-
-    sendMessage(roomID, `Berikut link untuk Callnya:\nhttps://${custURL.shortenUrl}`);
+    // Replace available link if exist, otherwise just push the new one
+    if (addInfo.length) {
+      let found = false;
+      for (data of addInfo) {
+        if (data.key === "Call URL") {
+          data.value = agentCallURL;
+          found = true;
+        }
+      }
+      if (!found) addInfo.push({key: "Call URL", value: agentCallURL});
+    } else {
+      addInfo.push({key: "Call URL", value: agentCallURL});
+    }
+    
+    // Send the link to customer as a message
+    sendMessage(roomID, `Berikut link untuk Callnya:\n${custCallURL}`);
+    // 
     additionalInformation(roomID, addInfo);
 
   } catch (error) {
