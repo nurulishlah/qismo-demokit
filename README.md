@@ -1,4 +1,4 @@
-# QISMO Demokit 2
+# Qiscus Multichannel Demokit
 
 Objective: The main goal is to ease business taking sales order from WhatsApp with proper level of sophistication. More [Qiscus Multichannel for Sales](https://quip.com/NkaBAXcKMrXn/Qiscus-Multichannel-for-Sales)
 
@@ -6,7 +6,8 @@ Objective: The main goal is to ease business taking sales order from WhatsApp wi
 
 - **Sales Order template:** For capturing essential order data for later to be used for e-invoice and order reporting generation.
 - **Auto Order ID generation:** Provide unique ID number for easy order referencing and tracking.
-- **Auto E-Invoice generation:** Provide auto pre-defined flexible e-invoice template message.
+<!-- - **Auto E-Invoice generation:** Provide auto pre-defined flexible e-invoice template message. -->
+- **Auto call URL generation:** Provide auto audio/video call links for end user and for agent
 - **Auto room tag by Order ID:** To speed up room filtering process for later monitoring and audit purposes.
 
 ### Requirements
