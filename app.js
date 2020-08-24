@@ -138,13 +138,13 @@ const generateCallURLs = async (body) => {
 
     // Generate Call URL
     const custURL = await generateUrl(roomID, custName, custAvatar);
-    const custShorURL = custURL.shortenUrl? custURL.shortenUrl : custURL.url;
     const agentURL = await generateUrl(roomID, agentName);
-    const agentShorURL = agentURL.shortenUrl? agentURL.shortenUrl : agentURL.url;
     
     // Parse customer and agent call URLs
-    const agentCallURL = `https://${agentShorURL}#config.prejoinPageEnabled=false&config.requireSetPassword=false`;
-    const custCallURL = `https://${custShorURL}#config.prejoinPageEnabled=false&config.requireSetPassword=false`;
+    const agentCallURL = agentURL.shortenUrl ? `https://${agentURL.shortenUrl}#config.prejoinPageEnabled=false&config.requireSetPassword=false`
+      : `${agentURL.url}#config.prejoinPageEnabled=false&config.requireSetPassword=false`;
+    const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}#config.prejoinPageEnabled=false&config.requireSetPassword=false`
+      : `${custURL.url}#config.prejoinPageEnabled=false&config.requireSetPassword=false`;
 
     // Replace available link if exist, otherwise just push the new one
     if (addInfo.length) {
