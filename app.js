@@ -141,7 +141,7 @@ const generateCallURLs = async (body) => {
     const agentURL = await generateUrl(roomID, agentName);
     
     // Parse customer and agent call URLs
-    const trailingParams = "#config.prejoinPageEnabled=false&config.requireSetPassword=false";
+    const trailingParams = "#config.prejoinPageEnabled=false&config.requireSetPassword=false&config.disableDeepLinking=true";
     const agentCallURL = agentURL.shortenUrl ? `https://${agentURL.shortenUrl}${trailingParams}` : `${agentURL.url}${trailingParams}`;
     const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
 
