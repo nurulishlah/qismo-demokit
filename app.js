@@ -109,10 +109,10 @@ const sendMessage = async (roomID, message, msgType="text", callUrl="",
   }
 };
 
-const sendWAMessage = async (userNo, name, callUrl="") => {
+const sendWAMessage = async (userNumber, userName, callUrl="") => {
   const url = `${process.env.QISMO_BASE_URL}/whatsapp/v1/${process.env.QISMO_APP_ID}/${process.env.WA_CHANNEL_ID}/messages`;
   let payload = JSON.stringify({
-    "to": userNo,
+    "to": userNumber,
     "type": "template",
     "template": {
       "namespace": process.env.WA_NAMESPACE,
@@ -125,7 +125,7 @@ const sendWAMessage = async (userNo, name, callUrl="") => {
           "type": "header",
           "parameters": [{
             "type": "text",
-            "text": name
+            "text": userName
           }]
         },
         {
@@ -146,8 +146,8 @@ const sendWAMessage = async (userNo, name, callUrl="") => {
   };
 
   try {
-    console.log(`send message ${message} to room: ${roomID}`);
     const { data } = await axios.post(url, payload, { headers: headers });
+    console.log(`send ${message} link to phone number ${userNumber}`);
 
     return data;
   } catch (error) {
@@ -177,6 +177,7 @@ const generateCallURLs = async (body) => {
     const roomID = body.room_id;
     const custName = body.customer.name;
     const custAvatar = body.customer.avatar;
+    const custId = body.customer.user_id;
     const agentName = body.agent.name;
     const agentEmail = body.agent.email;
     const channelType = body.channel_type;
@@ -189,8 +190,7 @@ const generateCallURLs = async (body) => {
     // Parse customer and agent call URLs
     const trailingParams = "#config.prejoinPageEnabled=false&config.requireSetPassword=false&config.disableDeepLinking=true";
     const agentCallURL = agentURL.shortenUrl ? `https://${agentURL.shortenUrl}${trailingParams}` : `${agentURL.url}${trailingParams}`;
-    const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
-
+    
     // Replace available link if exist, otherwise just push the new one
     if (addInfo.length) {
       let found = false;
@@ -204,16 +204,19 @@ const generateCallURLs = async (body) => {
     } else {
       addInfo.push({key: "Call URL", value: agentCallURL});
     }
-    
-    // Send the link to customer as a message
-    if (channelType === "WhatsApp") {
-      sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`); 
-    } else {
-      sendMessage(roomID, "Berikut link untuk call-nya", "buttons", custCallURL); 
-    }
-    
+
+    // Set Additional information
     additionalInformation(roomID, addInfo);
 
+    // Parse customer call URL and send it as Interactive WhatsApp message (button) to customer
+    if (channelType === "WhatsApp") {
+      const custCallURL = `/${roomID}?jwt=${custURL.token}${trailingParams}`;
+      sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`);
+      sendWAMessage(custId, custName, custCallURL);
+    } else {
+      const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
+      sendMessage(roomID, "Berikut link untuk call-nya", "buttons", custCallURL); 
+    }
   } catch (error) {
     throw error;
   }
