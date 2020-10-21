@@ -113,7 +113,7 @@ const generateUrl = async (roomID, name, avatar="https://image.flaticon.com/icon
   try {
     const url = process.env.GENERATE_MEET_URL;
     const payload = {
-      baseUrl: `https://meet.qiscus.com/${roomID}-${name}`,
+      baseUrl: `https://meet.qiscus.com/${roomID}`,
 	    avatar: avatar,
 	    name: name
     };
