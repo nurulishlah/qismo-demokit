@@ -109,6 +109,52 @@ const sendMessage = async (roomID, message, msgType="text", callUrl="",
   }
 };
 
+const sendWAMessage = async (userNo, name, callUrl="") => {
+  const url = `${process.env.QISMO_BASE_URL}/whatsapp/v1/${process.env.QISMO_APP_ID}/${process.env.WA_CHANNEL_ID}/messages`;
+  let payload = JSON.stringify({
+    "to": userNo,
+    "type": "template",
+    "template": {
+      "namespace": process.env.WA_NAMESPACE,
+      "name": process.env.WA_TEMPLATE_NAME,
+      "language": {
+        "policy": "deterministic",
+        "code": "id"
+      },
+      "components": [{
+          "type": "header",
+          "parameters": [{
+            "type": "text",
+            "text": name
+          }]
+        },
+        {
+          "type": "button",
+          "sub_type": "url",
+          "index": "0",
+          "parameters": [{
+            "type": "text",
+            "text": callUrl
+          }]
+        }
+      ]
+    }
+  });
+  const headers = {
+    Authorization: process.env.QISMO_AUTH_TOKEN,
+    app_id: process.env.QISMO_APP_ID
+  };
+
+  try {
+    console.log(`send message ${message} to room: ${roomID}`);
+    const { data } = await axios.post(url, payload, { headers: headers });
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const generateUrl = async (roomID, name, avatar="https://image.flaticon.com/icons/svg/145/145867.svg") => {
   try {
     const url = process.env.GENERATE_MEET_URL;
