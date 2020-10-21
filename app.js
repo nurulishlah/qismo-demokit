@@ -22,7 +22,11 @@ const additionalInformation = async (roomID, userInfo) => {
       Authorization: process.env.QISMO_AUTH_TOKEN,
     };
 
-    const { data } = await axios.post(url, paylaod, { headers: headers });
+    const {
+      data
+    } = await axios.post(url, paylaod, {
+      headers: headers
+    });
     return data;
   } catch (error) {
     throw error;
@@ -36,7 +40,11 @@ const getTag = async (roomID) => {
       Authorization: process.env.QISMO_AUTH_TOKEN,
     };
 
-    const { data } = await axios.get(url, { headers: headers });
+    const {
+      data
+    } = await axios.get(url, {
+      headers: headers
+    });
     return data;
   } catch (error) {
     throw error;
@@ -63,15 +71,19 @@ const addTag = async (tagName, roomID) => {
       'Qiscus-App-Id': process.env.QISMO_APP_ID,
     };
 
-    const { data } = await axios.post(url, payload, { headers: headers });
+    const {
+      data
+    } = await axios.post(url, payload, {
+      headers: headers
+    });
     return data;
   } catch (error) {
     throw error;
   }
 };
 
-const sendMessage = async (roomID, message, msgType="text", callUrl="",
-  senderEmail=process.env.QISMO_ADMIN_EMAIL) => {
+const sendMessage = async (roomID, message, msgType = "text", callUrl = "",
+  senderEmail = process.env.QISMO_ADMIN_EMAIL) => {
   try {
     console.log(`send message ${message} to room: ${roomID}`);
     const url = `${process.env.QISMO_BASE_URL}/${process.env.QISMO_APP_ID}/bot`;
@@ -84,16 +96,14 @@ const sendMessage = async (roomID, message, msgType="text", callUrl="",
     if (msgType === "buttons") {
       msgPayload["payload"] = {
         text: message,
-        buttons: [
-          {
-              label: "Lakukan panggilan",
-              type: "link",
-              payload: {
-                url: callUrl
-              }
+        buttons: [{
+          label: "Lakukan panggilan",
+          type: "link",
+          payload: {
+            url: callUrl
           }
-        ]
-      }  
+        }]
+      }
     }
 
     const headers = {
@@ -101,7 +111,11 @@ const sendMessage = async (roomID, message, msgType="text", callUrl="",
       QISCUS_SDK_SECRET: process.env.QISCUS_SDK_SECRET
     };
 
-    const { data } = await axios.post(url, msgPayload, { headers: headers });
+    const {
+      data
+    } = await axios.post(url, msgPayload, {
+      headers: headers
+    });
 
     return data;
   } catch (error) {
@@ -109,9 +123,9 @@ const sendMessage = async (roomID, message, msgType="text", callUrl="",
   }
 };
 
-const sendWAMessage = async (userNumber, userName, callUrl="") => {
-  const url = `${process.env.QISMO_BASE_URL}/whatsapp/v1/${process.env.QISMO_APP_ID}/${process.env.WA_CHANNEL_ID}/messages`;
-  let payload = JSON.stringify({
+const sendWAMessage = async (userNumber, userName, callUrl = "") => {
+  console.log(userNumber, userName, callUrl)
+  var data = JSON.stringify({
     "to": userNumber,
     "type": "template",
     "template": {
@@ -122,50 +136,56 @@ const sendWAMessage = async (userNumber, userName, callUrl="") => {
         "code": "id"
       },
       "components": [{
-          "type": "header",
-          "parameters": [{
-            "type": "text",
-            "text": userName
-          }]
-        },
-        {
-          "type": "button",
-          "sub_type": "url",
-          "index": "0",
-          "parameters": [{
-            "type": "text",
-            "text": callUrl
-          }]
-        }
-      ]
+        "type": "header",
+        "parameters": [{
+          "type": "text",
+          "text": userName
+        }]
+      }, {
+        "type": "button",
+        "sub_type": "url",
+        "index": "0",
+        "parameters": [{
+          "type": "text",
+          "text": callUrl
+        }]
+      }]
     }
   });
-  const headers = {
-    Authorization: process.env.QISMO_AUTH_TOKEN,
-    app_id: process.env.QISMO_APP_ID
+
+  var config = {
+    method: 'post',
+    url: `${process.env.QISMO_BASE_URL}/whatsapp/v1/${process.env.QISMO_APP_ID}/${process.env.WA_CHANNEL_ID}/messages`,
+    headers: {
+      'Authorization': process.env.QISMO_AUTH_TOKEN,
+      'Content-Type': 'application/json',
+      'app_id': process.env.QISMO_APP_ID
+    },
+    data: data
   };
 
-  try {
-    const { data } = await axios.post(url, payload, { headers: headers });
-    console.log(`send ${message} link to phone number ${userNumber}`);
-
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 };
 
-const generateUrl = async (roomID, name, avatar="https://image.flaticon.com/icons/svg/145/145867.svg") => {
+const generateUrl = async (roomID, name, avatar = "https://image.flaticon.com/icons/svg/145/145867.svg") => {
   try {
     const url = process.env.GENERATE_MEET_URL;
     const payload = {
       baseUrl: `https://meet.qiscus.com/${roomID}`,
-	    avatar: avatar,
-	    name: name
+      avatar: avatar,
+      name: name
     };
 
-    const { data } = await axios.post(url, payload);
- 
+    const {
+      data
+    } = await axios.post(url, payload);
+
     return data
   } catch (error) {
     throw error;
@@ -186,11 +206,11 @@ const generateCallURLs = async (body) => {
     // Generate Call URL
     const custURL = await generateUrl(roomID, custName, custAvatar);
     const agentURL = await generateUrl(roomID, agentName);
-    
+
     // Parse customer and agent call URLs
     const trailingParams = "#config.prejoinPageEnabled=false&config.requireSetPassword=false&config.disableDeepLinking=true";
     const agentCallURL = agentURL.shortenUrl ? `https://${agentURL.shortenUrl}${trailingParams}` : `${agentURL.url}${trailingParams}`;
-    
+
     // Replace available link if exist, otherwise just push the new one
     if (addInfo.length) {
       let found = false;
@@ -200,9 +220,15 @@ const generateCallURLs = async (body) => {
           found = true;
         }
       }
-      if (!found) addInfo.push({key: "Call URL", value: agentCallURL});
+      if (!found) addInfo.push({
+        key: "Call URL",
+        value: agentCallURL
+      });
     } else {
-      addInfo.push({key: "Call URL", value: agentCallURL});
+      addInfo.push({
+        key: "Call URL",
+        value: agentCallURL
+      });
     }
 
     // Set Additional information
@@ -210,12 +236,12 @@ const generateCallURLs = async (body) => {
 
     // Parse customer call URL and send it as Interactive WhatsApp message (button) to customer
     if (channelType === "WhatsApp") {
-      const custCallURL = `/${roomID}?jwt=${custURL.token}${trailingParams}`;
-      sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`);
+      const custCallURL = `${roomID}?jwt=${custURL.token}${trailingParams}`;
+      // sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`);
       sendWAMessage(custId, custName, custCallURL);
     } else {
       const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
-      sendMessage(roomID, "Berikut link untuk call-nya", "buttons", custCallURL); 
+      sendMessage(roomID, "Berikut link untuk call-nya", "buttons", custCallURL);
     }
   } catch (error) {
     throw error;
@@ -237,8 +263,7 @@ app.post('/caa', async (req, res, next) => {
     const email = body.email;
     const name = body.name;
 
-    let paylaod = [
-      {
+    let paylaod = [{
         key: 'Order ID',
         value: '-',
       },
@@ -292,7 +317,10 @@ app.post('/ticket', async (req, res, next) => {
     const roomID = body.room_id;
     const custName = body.customer.name;
     let addInfo = body.additional_info;
-    addInfo[0] = { key: 'Order ID', value: roomID };
+    addInfo[0] = {
+      key: 'Order ID',
+      value: roomID
+    };
 
     let message = 'Berikut e-invoice anda';
     let payment = '';
