@@ -241,7 +241,9 @@ const generateCallURLs = async (body) => {
       sendWAMessage(custId, custName, custCallURL);
     } else {
       const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
-      sendMessage(roomID, "Berikut link untuk call-nya", "buttons", custCallURL);
+      sendMessage(roomID, 
+        `Hai ${custName},\nBerikut link untuk melakukan panggilannya.\nSilahkan klik tombol berikut untuk melakukan panggilan`, 
+        "buttons", custCallURL);
     }
   } catch (error) {
     throw error;
