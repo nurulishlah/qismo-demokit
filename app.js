@@ -133,7 +133,7 @@ const sendWAMessage = async (userNumber, userName, callUrl = "") => {
       "name": process.env.WA_TEMPLATE_NAME,
       "language": {
         "policy": "deterministic",
-        "code": "id"
+        "code": process.env.WA_LANG
       },
       "components": [{
         "type": "header",
