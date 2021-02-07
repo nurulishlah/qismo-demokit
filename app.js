@@ -94,10 +94,11 @@ const sendMessage = async (roomID, message, msgType = "text", callUrl = "",
       room_id: roomID.toString(),
     };
     if (msgType === "buttons") {
+      const btnLabel = process.env.WA_LANG === "en"? "Make a call" : "Lakukan panggilan";
       msgPayload["payload"] = {
         text: message,
         buttons: [{
-          label: "Lakukan panggilan",
+          label: btnLabel,
           type: "link",
           payload: {
             url: callUrl
@@ -241,9 +242,8 @@ const generateCallURLs = async (body) => {
       sendWAMessage(custId, custName, custCallURL);
     } else {
       const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
-      sendMessage(roomID, 
-        `Hai ${custName},\nBerikut link untuk melakukan panggilannya.\nSilahkan klik tombol berikut untuk melakukan panggilan`, 
-        "buttons", custCallURL);
+      const callMessage = process.env.WA_LANG === "en"? `Hi ${custName},\nHere's the link to make a call. Click the button to start the call.` : `Hai ${custName},\nBerikut link untuk melakukan panggilannya.\nSilahkan klik tombol berikut untuk melakukan panggilan`;
+      sendMessage(roomID, callMessage, "buttons", custCallURL);
     }
   } catch (error) {
     throw error;
