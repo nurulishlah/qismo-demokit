@@ -181,11 +181,11 @@ const generateUrl = async (
   try {
     const url = process.env.GENERATE_MEET_URL;
     const payload = {
-      baseUrl: `https://meet.qiscus.com/${roomID}`,
       avatar: avatar,
       name: name,
       email: userID,
       iss: "meetcall",
+      sub: "call.qiscus.com",
       room: roomID,
       moderator: false,
       appId: process.env.QISMO_APP_ID
@@ -217,27 +217,23 @@ const generateCallURLs = async (body) => {
     const custURL = await generateUrl(roomID, custName, custAvatar, custId);
     const agentURL = await generateUrl(roomID, agentName, agentAvatar, agentEmail);
 
-    // Parse customer and agent call URLs
-    const trailingParams = "#config.prejoinPageEnabled=false&config.requireSetPassword=false&config.disableDeepLinking=true";
-    const agentCallURL = agentURL.shortenUrl ? `https://${agentURL.shortenUrl}${trailingParams}` : `${agentURL.url}${trailingParams}`;
-
     // Replace available link if exist, otherwise just push the new one
     if (addInfo.length) {
       let found = false;
       for (data of addInfo) {
         if (data.key === "Call URL") {
-          data.value = agentCallURL;
+          data.value = agentURL.url;
           found = true;
         }
       }
       if (!found) addInfo.push({
         key: "Call URL",
-        value: agentCallURL
+        value: agentURL.url
       });
     } else {
       addInfo.push({
         key: "Call URL",
-        value: agentCallURL
+        value: agentURL.url
       });
     }
 
@@ -246,13 +242,13 @@ const generateCallURLs = async (body) => {
 
     // Parse customer call URL and send it as Interactive WhatsApp message (button) to customer
     if (channelType === "WhatsApp") {
-      const custCallURL = `${roomID}?jwt=${custURL.token}${trailingParams}`;
       // sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`);
-      sendWAMessage(custId, custName, custCallURL);
+      sendWAMessage(custId, custName, custURL.url);
     } else {
-      const custCallURL = custURL.shortenUrl ? `https://${custURL.shortenUrl}${trailingParams}` : `${custURL.url}${trailingParams}`;
-      const callMessage = process.env.WA_LANG === "en"? `Hi ${custName},\nHere's the link to make a call. Click the button to start the call.` : `Hai ${custName},\nBerikut link untuk melakukan panggilannya.\nSilahkan klik tombol berikut untuk melakukan panggilan`;
-      sendMessage(roomID, callMessage, "buttons", custCallURL);
+      const enMsg = `Hi ${custName},\nHere's the link to make a call. Click the button to start the call.`;
+      const idMsg = `Hai ${custName},\nBerikut link untuk melakukan panggilannya.\nSilahkan klik tombol berikut untuk melakukan panggilan`;
+      const callMessage = process.env.WA_LANG === "en"? enMsg : idMsg;
+      sendMessage(roomID, callMessage, "buttons", custURL.url);
     }
   } catch (error) {
     throw error;
