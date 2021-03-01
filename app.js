@@ -94,7 +94,7 @@ const sendMessage = async (roomID, message, msgType = "text", callUrl = "",
       room_id: roomID.toString(),
     };
     if (msgType === "buttons") {
-      const btnLabel = process.env.WA_LANG === "en"? "Make a call" : "Lakukan panggilan";
+      const btnLabel = process.env.WA_LANG === "en"? "Make a call " : "Lakukan panggilan";
       msgPayload["payload"] = {
         text: message,
         buttons: [{
