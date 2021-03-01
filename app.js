@@ -174,13 +174,21 @@ const sendWAMessage = async (userNumber, userName, callUrl = "") => {
     });
 };
 
-const generateUrl = async (roomID, name, avatar = "https://image.flaticon.com/icons/svg/145/145867.svg") => {
+const generateUrl = async (
+  roomID, name, 
+  avatar = "https://image.flaticon.com/icons/svg/145/145867.svg",
+  userID = "") => {
   try {
     const url = process.env.GENERATE_MEET_URL;
     const payload = {
       baseUrl: `https://meet.qiscus.com/${roomID}`,
       avatar: avatar,
-      name: name
+      name: name,
+      email: userID,
+      iss: "meetcall",
+      room: roomID,
+      moderator: false,
+      appId: process.env.QISMO_APP_ID
     };
 
     const {
@@ -202,11 +210,12 @@ const generateCallURLs = async (body) => {
     const agentName = body.agent.name;
     const agentEmail = body.agent.email;
     const channelType = body.channel_type;
+    const agentAvatar = "https://image.flaticon.com/icons/svg/145/145867.svg";
     let addInfo = body.additional_info;
 
     // Generate Call URL
-    const custURL = await generateUrl(roomID, custName, custAvatar);
-    const agentURL = await generateUrl(roomID, agentName);
+    const custURL = await generateUrl(roomID, custName, custAvatar, custId);
+    const agentURL = await generateUrl(roomID, agentName, agentAvatar, agentEmail);
 
     // Parse customer and agent call URLs
     const trailingParams = "#config.prejoinPageEnabled=false&config.requireSetPassword=false&config.disableDeepLinking=true";
