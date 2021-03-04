@@ -242,8 +242,9 @@ const generateCallURLs = async (body) => {
 
     // Parse customer call URL and send it as Interactive WhatsApp message (button) to customer
     if (channelType === "WhatsApp") {
+      const custCallURL = `${process.env.QISMO_APP_ID}/${roomID}?jwt=${custURL.token}`;
       // sendMessage(roomID, `Berikut link untuk call-nya:\n${custCallURL}`);
-      sendWAMessage(custId, custName, custURL.url);
+      sendWAMessage(custId, custName, custCallURL);
     } else {
       const enMsg = `Hi ${custName},\nHere's the link to make a call. Click the button to start the call.`;
       const idMsg = `Hai ${custName},\nBerikut link untuk melakukan panggilannya.\nSilahkan klik tombol berikut untuk melakukan panggilan`;
