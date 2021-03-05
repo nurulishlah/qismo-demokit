@@ -188,7 +188,7 @@ const generateUrl = async (
       sub: "call.qiscus.com",
       room: roomID,
       moderator: false,
-      appId: process.env.QISMO_APP_ID
+      appId: process.env.CALL_APP_ID
     };
 
     const {
